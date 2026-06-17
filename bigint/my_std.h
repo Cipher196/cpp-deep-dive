@@ -8,11 +8,12 @@
 
 #include <cstdint>
 #include <cstddef>
-#include <cstdint>
+
 
 
 // Explicitly bring only what you need into the global space of whoever includes this
 using std::cout;
+using std::cin;
 using std::endl;
 using std::vector;
 using std::string;

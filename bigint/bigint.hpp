@@ -1,6 +1,6 @@
+#pragma once
+
 #include "my_std.h"
-#include <iostream>
-#include <string>
 
 class bigint {
 private:
@@ -27,22 +27,50 @@ private:
   uint64_t divide_scalar(uint64_t divisor) {
     unsigned __int128 carry = 0;
 
-    // We go from most significant digit to least significant
     for (long long i = digits.size() - 1; i >= 0; --i) {
-      unsigned __int128 current = (carry << 64) | digits[i];
-      digits[i] = (uint64_t)(current / divisor);
-      carry = current % divisor;
+      unsigned __int128 curr = (carry << 64) | digits[i];
+      digits[i] = (uint64_t)(curr / divisor);
+      carry = curr % divisor;
     }
 
-    // Remove leading zeros resulting from division
     while (digits.size() > 1 && digits.back() == 0) {
       digits.pop_back();
     }
 
-    return (uint64_t)carry; // This is our decimal digit
+    return (uint64_t)carry;
+  }
+
+  void zero_check() {
+    if (digits.empty() || (digits.size() == 1 && digits[0] == 0)) {
+      digits = {0};
+      isPositive = true;
+    }
   }
 
 public:
+  bool ip() const { return isPositive; }
+
+  void flipSign() { isPositive=!isPositive; }
+
+  const vector<uint64_t>& get_digits() const { return digits;}
+  
+  vector<uint64_t>& get_digit() { return digits;}
+
+
+  bigint(long long val = 0) {
+    if (val < 0) {
+      isPositive = false;
+      val = -val;
+    } else {
+      isPositive = true;
+    }
+
+    digits.push_back((uint64_t)val);
+    zero_check();
+  }
+
+  bigint(const std::string &s) { from_string(s); }
+
   void from_string(const string &s) {
     digits.clear();
     isPositive = true;
@@ -65,13 +93,14 @@ public:
       uint64_t digit_val = s[i] - '0';
       multiply_add(10, digit_val);
     }
+    zero_check();
   }
+
   string to_string() const {
     if (digits.empty() || (digits.size() == 1 && digits[0] == 0)) {
       return "0";
     }
 
-    // We make a copy because division will destroy the number
     bigint temp = *this;
     string result = "";
 
@@ -84,18 +113,7 @@ public:
       result += "-";
     }
 
-    // Since we extracted digits from right to left, we must reverse the string
     reverse(result.begin(), result.end());
     return result;
   }
 };
-
-int main() {
-  string s;
-  std::cin >> s;
-  bigint bi;
-  bi.from_string(s);
-  std::cout << bi.to_string();
-
-  return 0;
-}
