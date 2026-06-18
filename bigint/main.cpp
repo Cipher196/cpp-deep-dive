@@ -1,15 +1,20 @@
-#include "my_std.h"
-#include "bigint.hpp"
+#include "arithmetic.hpp"
 
 
 int main() {
-  string s;
-  cin >> s;
-  bigint bi;
-  bi.from_string(s);
-  cout << bi.to_string();
-  
-  bigint ci("39399kkk2i2i2kkk2kk2k");
-  cout<<'\n'<<ci.to_string();
+  string a, b;
+  cout<<"Please provide first number to add: ";
+  cin>>a;
+  cout<<"Please provide second number to add: ";
+  cin>>b;
+
+  bigint x(a);
+  bigint y(b);
+
+  bigint z=subtract(x,y);
+
+  string c=z.to_string();
+
+  cout<<"Their sum is "<<c;
   return 0;
 }
