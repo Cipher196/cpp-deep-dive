@@ -61,7 +61,24 @@ public:
   vector<uint64_t> &get_digit() { return digits; }
 
   void at(size_t i, uint64_t val) { digits[i] = val; }
+  // Inside your bigint class
+  bigint shift_left(size_t blocks) const {
+    if (blocks == 0 || (digits.size() == 1 && digits[0] == 0)) {
+      return *this;
+    }
 
+    bigint result;
+    result.digits.assign(blocks,
+                         0); // Blindly pad with exact number of required 0s
+
+    // Append the actual numbers on top of the shifted blocks
+    for (size_t i = 0; i < this->digits.size(); i++) {
+      result.digits.push_back(this->digits[i]);
+    }
+
+    result.isPositive = this->isPositive;
+    return result;
+  }
   bigint(long long val = 0) {
     uint64_t absVal;
     if (val < 0) {

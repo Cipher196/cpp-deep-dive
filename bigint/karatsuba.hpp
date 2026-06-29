@@ -1,26 +1,34 @@
 #include "BasecaseMultiply.hpp"
-#include "addition_and_subtraction.hpp"
-#include "bigint.hpp"
 
 inline size_t karatsuba_threshold = 10;
 
 inline bigint mod_with_basePower_k(const bigint &a, size_t k) {
-  bigint c(a.get_digits()[0]);
-  for (int i = 1; i < k; i++) {
-    c.get_digit().push_back(a.get_digits()[k]);
+  bigint c;
+  c.get_digit().clear();
+  size_t limit = std::min(k, a.get_digits().size());
+  for (size_t i = 0; i < limit; i++) {
+    c.get_digit().push_back(a.get_digits()[i]);
   }
+  if (c.get_digits().empty())
+    c.get_digit().push_back(0);
   return c;
 }
 
 inline bigint div_with_basePower_k(const bigint &a, size_t k) {
-  bigint c(a.get_digits()[k]);
-  for (int i = k + 1; i < a.get_digits().size(); i++) {
-    c.get_digit().push_back(a.get_digits()[k]);
+  if (k >= a.get_digits().size())
+    return bigint(0);
+
+  bigint c;
+  c.get_digit().clear();
+  for (size_t i = k; i < a.get_digits().size(); i++) {
+    c.get_digit().push_back(a.get_digits()[i]);
   }
   return c;
 }
 
-inline bigint multiply_karatsuba(const bigint &a, const bigint &b) {
+inline bigint multiply_karatsuba(const bigint &a, const bigint &b);
+
+inline bigint multiply_karatsuba_core(const bigint &a, const bigint &b) {
   size_t l = std::max(a.get_digits().size(), b.get_digits().size());
   if (l < karatsuba_threshold)
     return multiply_naive(a, b);
@@ -46,4 +54,20 @@ inline bigint multiply_karatsuba(const bigint &a, const bigint &b) {
   c4 = add(c4, c0);
 
   return c4;
+}
+
+inline bigint multiply_karatsuba(const bigint &a, const bigint &b) {
+  bigint abs_a = a;
+  if (!abs_a.ip())
+    abs_a.flipSign();
+
+  bigint abs_b = b;
+  if (!abs_b.ip())
+    abs_b.flipSign();
+
+  bigint result = multiply_karatsuba_core(abs_a, abs_b);
+
+  if (a.ip() ^ b.ip())
+    result.flipSign();
+  return result;
 }

@@ -1,5 +1,5 @@
 #include "bigint.hpp"
-#include "karatsuba.hpp"
+#include "toomcook.hpp"
 #include <chrono>
 #include <random>
 
@@ -36,11 +36,23 @@ int main() {
                 .count()) /
       1000;
 
-  cout << "We are computing c^2 ... \n";
+  auto t5 = std::chrono::high_resolution_clock::now();
+  bigint d = multiply_toom_cook(c, c);
+  auto t6 = std::chrono::high_resolution_clock::now();
+
+  auto time3 =
+      float(std::chrono::duration_cast<std::chrono::milliseconds>(t6 - t5)
+                .count()) /
+      1000;
+
+  cout << "\nWe are computing square of a number which has " << n
+       << " digits.\n";
 
   cout << "\nTime taken by naive multiply : " << time1 << " Sec\n\n";
 
   cout << "Time taken by karatsuba multiply : " << time2 << " Sec\n\n";
+
+  cout << "Time taken by toom cook multiply : " << time3 << " Sec\n";
 
   return 0;
 }
